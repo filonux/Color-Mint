@@ -16,6 +16,16 @@ Cinnamon reparte su apariencia entre el panel de Ajustes, `dconf-editor` y coman
 
 Color Mint junta todo eso —temas, panel, escritorio, terminal y fuentes— en una sola ventana, o en una sola línea de comandos si prefieres la terminal. Ya sabe qué esquema toca en cada caso, y guarda una copia de seguridad antes de aplicar cualquier cambio.
 
+
+<img width="945" height="762" alt="color-mint-menu" src="https://github.com/user-attachments/assets/f4afd370-58fc-416f-9355-081fc0711d98" />
+<img width="943" height="768" alt="2 mint-colorr-panel" src="https://github.com/user-attachments/assets/0206a86b-1d82-4ca5-981f-cb3875236ead" />
+<img width="946" height="760" alt="3 mint-color-escritorio" src="https://github.com/user-attachments/assets/01e96f4c-631f-4cb4-b1b8-d205cba1aacf" />
+<img width="944" height="756" alt="4 mint-color-avanzado" src="https://github.com/user-attachments/assets/62e5b70d-cb28-46c2-bcbc-0b872f527329" />
+<img width="936" height="768" alt="5 mint-color-terminal" src="https://github.com/user-attachments/assets/0c8ae2b0-0023-41e3-8914-ddcd27023351" />
+<img width="945" height="764" alt="6 mint-color-fuentes" src="https://github.com/user-attachments/assets/8301519c-63f9-4b43-adf9-bf5982a01e3e" />
+<img width="942" height="759" alt="7 mint-color-perfiles" src="https://github.com/user-attachments/assets/0dd41a43-38fb-4bca-95ae-c44eb0841d4f" />
+
+
 ## Funciones
 
 Siete bloques, tanto en la interfaz gráfica como en la terminal:
