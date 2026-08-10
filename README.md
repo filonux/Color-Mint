@@ -217,26 +217,6 @@ Si te interesaría una versión en inglés, dilo en un issue — es la señal qu
 
 Otra herramienta del mismo autor: [**Scriptya**](https://github.com/filonux/Scriptya), que convierte cualquier script en una app independiente con su propio icono, integrada en el menú de Cinnamon y/o en el escritorio, y de paso deja lanzarlo, actualizarlo o desinstalarlo desde un único menú.
 
-## Estructura del repositorio
-
-```
-color-mint/
-├── LICENSE
-├── README.md
-├── script/
-│   └── color-mint.sh
-├── assets/
-│   └── icon.png              # icono de la app (usado arriba en este README)
-└── .github/
-    ├── ISSUE_TEMPLATE/
-    │   ├── bug_report.md
-    │   └── feature_request.md
-    ├── PULL_REQUEST_TEMPLATE.md
-    ├── CONTRIBUTING.md
-    ├── CODE_OF_CONDUCT.md
-    └── SECURITY.md
-```
-
 ## Contribuir
 
 Los issues y pull requests son bienvenidos — hay plantillas en `.github/` para reportar errores, proponer mejoras o enviar un PR. La guía completa está en [CONTRIBUTING.md](.github/CONTRIBUTING.md). Este proyecto sigue el [Código de Conducta](.github/CODE_OF_CONDUCT.md) del repositorio; para reportar un problema de seguridad en vez de abrir un issue público, consulta [SECURITY.md](.github/SECURITY.md).
