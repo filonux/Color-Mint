@@ -60,7 +60,7 @@ Un par de cosas más que no vienen en el panel de Ajustes de Mint:
 Clonar y ejecutar; no hay ningún paso de instalación aparte:
 
 ```bash
-git clone https://github.com/filonux/color-mint.git
+git clone https://github.com/filonux/Color-Mint.git
 cd color-mint/script
 chmod +x color-mint.sh
 ./color-mint.sh
