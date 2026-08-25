@@ -209,9 +209,9 @@ Color Mint está en español: interfaz gráfica, ayuda, mensajes y comentarios d
 
 - [ ] Traducción completa de la interfaz, la ayuda (`--help`) y los mensajes al inglés
 - [ ] Forma de elegir idioma (detección del sistema o un flag `--lang`)
-- [ ] Este README también en inglés
+- [ ] Empaquetado en un .deb
 
-Si te interesaría una versión en inglés, dilo en un issue — es la señal que necesito para priorizarlo.
+Si te interesaría una versión en inglés, empaquetado, dilo en un issue — es la señal que necesito para priorizarlo. También puedes apoyar el proyecto con estrellas para que sigamos mejorándolo.
 
 ## Ver también
 
