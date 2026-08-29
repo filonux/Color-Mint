@@ -1,4 +1,4 @@
-<a href="assets/icon.png"><img src="assets/icon2.png" alt="Icono de Color Mint" width="140"></a>
+<a href="assets/icon.png"><img src="assets/icon.png" alt="Icono de Color Mint" width="140"></a>
 
 # Color Mint
 
