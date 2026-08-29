@@ -228,4 +228,4 @@ Copyright © 2026 Filonux.
 
 ---
 
-Hecho por **Filonux**.
+Hecho por **[Filonux](https://github.com/filonux)**.
