@@ -1,38 +1,40 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Something does not work as expected
 title: ''
-labels: ''
+labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**What happened**
+A clear and concise description of the problem.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**How to reproduce it**
+The steps, or the exact command:
+1. ...
+2. ...
+3. ...
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**What you expected**
+What you thought would happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**What actually happened**
+Error messages, the dialog Color Mint showed (the items marked with ⚠), or what looked wrong.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Your setup**
+- Color Mint version (`./color-mint.sh --version`):
+- Distribution and version (for example Linux Mint 22.3 Cinnamon):
+- Cinnamon version (`cinnamon --version`) and session (`echo "$XDG_SESSION_TYPE"`):
+- `yad` version (`yad --version`) and Bash version (`bash --version | head -1`):
+- Language of the interface (ES or EN):
+- How you ran it: the graphical window (which tab and button) or the terminal (the command):
+- Run from the clone, or installed with `./color-mint.sh install`:
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Log and screenshots**
+The log is in `~/.local/share/color-mint/logs/`. Paste the relevant lines, after reading them: they can contain theme names and paths. A screenshot helps too.
 
-**Additional context**
-Add any other context about the problem here.
+**Anything else**
+Anything that might help.
+
+If the problem is a security issue, please do not open a public issue: read `.github/SECURITY.md` first.
