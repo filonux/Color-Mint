@@ -1,25 +1,32 @@
-## Descripción
+## What does this change?
 
-Explica qué cambia este PR y por qué.
+Explain what this pull request changes and why. Link the issue if there is one (for example `Closes #12`).
 
-## Tipo de cambio
+## Type of change
 
-- [ ] Corrección de error
-- [ ] Función nueva
-- [ ] Cambio en la documentación (README, plantillas, etc.)
-- [ ] Refactor / limpieza interna sin cambio de comportamiento
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation (README, templates...)
+- [ ] Refactor or cleanup with no change in behavior
+- [ ] Tests only
 
-## ¿Cómo lo probaste?
+## How did you test it?
 
-Describe en qué distro/entorno lo probaste y qué casos verificaste
+Say what you ran and where.
 
-- Distro y versión:
-- Sesión: X11 / Wayland
+- Distribution and version:
+- Session: X11 / Wayland
+- `./color-mint.sh --version`:
+- `bash tests/run.sh` (the `Summary:` line, and which suites you could not run, if any):
 
 ## Checklist
 
-- [ ] Probé el script manualmente después de mis cambios y sigue funcionando
-- [ ] Pasé `shellcheck`y no introduje warnings nuevos
-- [ ] Los comentarios que añadí explican el *por qué*, no repiten lo obvio del *qué*
-- [ ] Actualicé el README si el cambio afecta al uso o los requisitos
-- [ ] No incluí archivos generados, temporales ni credenciales
+- [ ] `bash tests/run.sh` passes
+- [ ] ShellCheck 0.11.0 reports nothing with `--severity=warning`
+- [ ] A new test fails when my fix is removed, and it is listed in `tests/run.sh`
+- [ ] New messages exist in English and Spanish
+- [ ] The CLI values `claro`, `oscuro`, `mantener` and `solo_color` and the window-button presets are unchanged
+- [ ] Every file the change writes is replaced atomically, and `uninstall` knows how to undo it
+- [ ] README.md and README.es.md are both updated if the change affects use, commands or requirements
+- [ ] The comments I added explain the *why*, not the *what*
+- [ ] No generated files, temporary files or credentials
