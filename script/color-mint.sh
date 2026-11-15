@@ -1849,7 +1849,8 @@ cm_restore_backup() {
 # ("icons"), in search order: the legacy per-user folder, the XDG user folder, then the XDG system
 # folders. Themes installed by modern installers land in ~/.local/share, and distro or local
 # packages in /usr/local/share, so all of them have to be searched.
-# Callers may stop reading early; where SIGPIPE is ignored, printf would then print "Broken pipe", so stderr is dropped.
+# Its readers return at the first match and close the pipe. When SIGPIPE is inherited as ignored (GitHub Actions does
+# this) the printf fails with EPIPE and writes "Broken pipe" to stderr instead of dying silently; hence the 2>/dev/null.
 cm_data_dirs() {
     local kind="$1" d
     local IFS=:
@@ -2238,8 +2239,8 @@ cm_validate_extracted_tree() {
 
 # cm_archive_entries_ok <zip|tar> <archive>: succeeds when the archive lists at most CM_MAX_ENTRIES entries (files and
 # folders). The listing stops one entry past the cap, so a flood of empty entries costs neither time nor a Bash loop.
-# Without pipefail, as below: stopping early ends unzip or tar with SIGPIPE.
-# head's own stderr is dropped: where SIGPIPE is ignored it would print "Broken pipe" if wc stopped reading.
+# Without pipefail, as below: stopping early ends unzip or tar with SIGPIPE. head has its own 2>/dev/null: with SIGPIPE
+# ignored it would print "Broken pipe" whenever the counter after it exits first.
 cm_archive_entries_ok() {
     local format="$1" archive="$2" counted
     case "$format" in
@@ -2258,7 +2259,7 @@ cm_archive_entries_ok() {
 # inflates to gigabytes, and a compressed tar declares nothing. The contents go through a counter that stops one byte
 # past the cap and writes nothing to disk. The caller extracts from the same private copy with the same decoder, so
 # the extraction cannot write more than was counted. The pipeline runs without pipefail: stopping early ends unzip or
-# tar with SIGPIPE. An unreadable count is a refusal. head's stderr is dropped, as in cm_archive_entries_ok.
+# tar with SIGPIPE, and head is silenced as in cm_archive_entries_ok. An unreadable count is a refusal.
 cm_archive_unpacked_ok() {
     local format="$1" archive="$2" flag="${3:-}" counted
     case "$format" in
@@ -2584,7 +2585,7 @@ cm_fetch_theme() {
 # purpose: packages that fill the selectors with dozens of variants (orchis-gtk-theme, yaru-theme-gtk) are left out.
 # package|what it brings|name
 # ============================================================================
-# Callers may stop reading early; where SIGPIPE is ignored, printf would then print "Broken pipe", so stderr is dropped.
+# 2>/dev/null on the closing brace, as in cm_data_dirs: cm_theme_package_known stops reading at the first match.
 cm_theme_package_table() {
     printf '%s\n' \
         'arc-theme|gtk_cin|Arc' \
