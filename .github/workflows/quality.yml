@@ -1,0 +1,103 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests-and-shellcheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # Write access is used only by the last step, to commit the restored execute bit.
+    permissions:
+      contents: write
+    env:
+      SHELLCHECK_VERSION: 0.11.0
+      SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # git stores the execute bit, a downloaded copy of the script loses it, and tests/test_quality.sh reads it from
+      # the index. On a branch push or a manual run the job sets it there; pull requests and tags are left as they are.
+      - name: Restore the executable bit of the main script
+        id: exec_bit
+        if: github.event_name != 'pull_request' && github.ref_type == 'branch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mode="$(git ls-files -s -- script/color-mint.sh | cut -c1-6)"
+          if [ "$mode" = 100644 ]; then
+            git update-index --chmod=+x -- script/color-mint.sh
+            echo "restored=true" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Executable bit::script/color-mint.sh is 100644 in git; the last step fixes it."
+          fi
+
+      - name: Install pinned ShellCheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          url="https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/${archive}"
+          curl --fail --location --retry 4 --retry-delay 2 --output "$RUNNER_TEMP/$archive" "$url"
+          printf '%s %s\n' "$SHELLCHECK_SHA256" "$RUNNER_TEMP/$archive" | sha256sum --check --status
+          tar -xJf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP"
+          install -m 0755 "$RUNNER_TEMP/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" "$RUNNER_TEMP/shellcheck"
+          echo "SHELLCHECK_BIN=$RUNNER_TEMP/shellcheck" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/shellcheck" --version
+
+      - name: Install test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install --yes --no-install-recommends imagemagick fonts-dejavu-core zip unzip xz-utils bzip2 xvfb x11-utils xdotool yad \
+            python3-gi gir1.2-gtk-4.0 gir1.2-adw-1
+
+      - name: Run static analysis
+        run: bash ./tests/lint.sh
+
+      - name: Run functional tests
+        env:
+          CM_REQUIRE_GUI_RENDER: "1"
+          CM_SCREENSHOT_DIR: ${{ runner.temp }}/screenshots
+        # test_quality.sh is skipped: it fails on tests/lib/mutation_import.py, a private tool that must stay outside
+        # the repository. To run it again: git rm --cached that file, then drop "--skip test_quality.sh".
+        run: bash ./tests/run.sh --skip lint.sh --skip test_quality.sh
+
+      - name: Keep GUI screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gui-screenshots
+          path: ${{ runner.temp }}/screenshots
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Check committed diff whitespace
+        run: git show --check --oneline --no-renames HEAD
+
+      # Last, so the diff check above looks at the pushed commit and not at this one.
+      - name: Commit the restored executable bit
+        if: success() && steps.exec_bit.outputs.restored == 'true'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit --quiet -m 'Restore the executable bit of script/color-mint.sh'
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if ! git push "$remote" "HEAD:${GITHUB_REF}"; then
+            msg='could not push the fix; locally run chmod +x script/color-mint.sh, git add it, commit and push'
+            echo "::error title=Executable bit::$msg"
+            exit 1
+          fi

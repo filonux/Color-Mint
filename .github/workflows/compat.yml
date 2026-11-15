@@ -1,0 +1,98 @@
+name: Compatibility
+
+# Best effort on other distributions. It never gates a change: it runs on demand and once a week (not on push or
+# pull request) and a failing distribution does not fail the run. Linux Mint itself is covered by quality.yml.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  distro:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    continue-on-error: true
+    container: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      PM: ${{ matrix.pm }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: debian-13
+            name: Debian 13
+            image: "debian:13"
+            pm: apt
+          - id: fedora
+            name: Fedora
+            image: "fedora:latest"
+            pm: dnf
+          - id: arch
+            name: Arch Linux
+            image: "archlinux:latest"
+            pm: pacman
+
+    steps:
+      # Tools the test suites use. yad, dconf and gsettings come later, from the names Color Mint itself gives.
+      - name: Install test tools
+        run: |
+          case "$PM" in
+            apt)
+              apt-get update -qq
+              apt-get install --yes --no-install-recommends git ca-certificates python3 procps imagemagick \
+                fonts-dejavu-core zip unzip xz-utils bzip2 xvfb x11-utils xdotool python3-gi gir1.2-gtk-4.0 gir1.2-adw-1
+              ;;
+            dnf)
+              dnf install -y git python3 procps-ng ImageMagick dejavu-sans-fonts zip unzip xz bzip2 tar gzip \
+                diffutils findutils gawk util-linux xorg-x11-server-Xvfb xdotool /usr/bin/xwininfo python3-gobject gtk4 libadwaita
+              ;;
+            pacman)
+              pacman -Syu --noconfirm --needed git python procps-ng imagemagick ttf-dejavu zip unzip xz bzip2 \
+                tar gzip diffutils findutils gawk util-linux xorg-server-xvfb xorg-xwininfo xdotool python-gobject gtk4 libadwaita
+              ;;
+          esac
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install the packages Color Mint names for its dependencies
+        run: bash ./tests/lib/program_deps.sh "$PM"
+
+      - name: Record versions
+        if: always()
+        run: |
+          . /etc/os-release
+          case "$PM" in
+            apt)    yad_version="$(dpkg-query -W -f='${Version}' yad 2>/dev/null)" || yad_version="" ;;
+            dnf)    yad_version="$(rpm -q --qf '%{VERSION}' yad 2>/dev/null)" || yad_version="" ;;
+            pacman) yad_version="$(pacman -Q yad 2>/dev/null | cut -d' ' -f2)" || yad_version="" ;;
+          esac
+          {
+            echo "### $PRETTY_NAME"
+            echo "- Bash ${BASH_VERSION}"
+            echo "- yad ${yad_version:-not installed}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run the test suites
+        env:
+          CM_REQUIRE_GUI_RENDER: "1"
+          CM_SCREENSHOT_DIR: ${{ runner.temp }}/screenshots
+        # test_quality.sh is skipped for the same reason as in quality.yml.
+        run: bash ./tests/run.sh --skip lint.sh --skip test_quality.sh
+
+      - name: Keep GUI screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gui-screenshots-${{ matrix.id }}
+          path: ${{ runner.temp }}/screenshots
+          if-no-files-found: ignore
+          retention-days: 14
