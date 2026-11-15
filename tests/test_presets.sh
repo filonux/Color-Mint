@@ -961,10 +961,11 @@ printf '# only a comment\n' > "$SHARE/in/comments.conf"
 must_fail run_cm "cm_import_preset '$SHARE/in/comments.conf'" >/dev/null 2>&1
 [ ! -e "$HOME_DIR/pwn" ] || fail 'a hostile preset ran code'
 
-# Size: only the 64 KB limit tells these two valid files apart (comments pad them).
-{ printf 'GTK_THEME="Mint-Y-Aqua"\n'; head -c 60000 < <(yes '# padding'); printf '\n'; } > "$SHARE/in/medium.conf"
+# Size: only the 64 KB limit tells these two valid files apart (comments pad them). yes stderr is dropped: with
+# SIGPIPE ignored (CI runners) it prints "Broken pipe" once head has its bytes.
+{ printf 'GTK_THEME="Mint-Y-Aqua"\n'; head -c 60000 < <(yes '# padding' 2>/dev/null); printf '\n'; } > "$SHARE/in/medium.conf"
 run_cm "cm_import_preset '$SHARE/in/medium.conf'" >/dev/null 2>&1 || fail 'a valid preset of 60 KB was refused'
-{ printf 'GTK_THEME="Mint-Y-Aqua"\n'; head -c 70000 < <(yes '# padding'); printf '\n'; } > "$SHARE/in/big.conf"
+{ printf 'GTK_THEME="Mint-Y-Aqua"\n'; head -c 70000 < <(yes '# padding' 2>/dev/null); printf '\n'; } > "$SHARE/in/big.conf"
 err="$(run_cm "cm_import_preset '$SHARE/in/big.conf'" 2>&1)" && fail 'a preset larger than 64 KB was imported'
 case "$err" in *"64 KB"*) ;; *) fail "the refusal for a big preset does not say why: $err" ;; esac
 [ ! -e "$PRESETS/big.conf" ] || fail 'a big preset was stored'
